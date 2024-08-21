@@ -2,12 +2,13 @@ import pandas as pd
 from math import ceil, floor
 import argparse
 
+# T4 version
 parser = argparse.ArgumentParser()
 parser.add_argument('--results_dir', type=str, required=True,
                         help='path to directory containing the profiling files')
-parser.add_argument('--max_threads_sm', type=int, default=2048,
+parser.add_argument('--max_threads_sm', type=int, default=1024,
                         help='maximum number of threads that can be active in an SM')
-parser.add_argument('--max_blocks_sm', type=int, default=80,
+parser.add_argument('--max_blocks_sm', type=int, default=16,
                         help='maximum number of blocks that can be active in an SM')
 parser.add_argument('--max_shmem_sm', type=int, default=65536,
                         help='maximum amount of shared memory (in bytes) per SM')

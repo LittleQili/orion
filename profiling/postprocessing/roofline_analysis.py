@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--results_dir', type=str, required=True,
                         help='path to directory containing the profiling files')
-parser.add_argument('--ai_threshold', type=float, default=9.72,
+parser.add_argument('--ai_threshold', type=float, default=9.37,
                         help='arithmetic intensity that seperates compute from memory bound kernels')
 args = parser.parse_args()
 
@@ -24,7 +24,8 @@ comp_throughput = df_basic['Compute(SM)(%)']
 fadd = 'smsp__sass_thread_inst_executed_op_fadd_pred_on.sum.per_cycle_elapsed [inst/cycle]'
 fmul = 'smsp__sass_thread_inst_executed_op_fmul_pred_on.sum.per_cycle_elapsed [inst/cycle]'
 ffma = 'smsp__sass_thread_inst_executed_op_ffma_pred_on.sum.per_cycle_elapsed [inst/cycle]'
-cycles_sec = 'smsp__cycles_elapsed.avg.per_second [cycle/nsecond]'
+# init nsecond
+cycles_sec = 'smsp__cycles_elapsed.avg.per_second [cycle/usecond]'
 bytes_sec = 'dram__bytes.sum.per_second [Gbyte/second]'
 
 ai_list = []
@@ -50,7 +51,7 @@ for index, row in df_raw.iterrows():
 
     if add or mul or fma:
         flops_cycle = add+mul+fma*2
-        flops_sec = flops_cycle * cycles
+        flops_sec = flops_cycle * cycles * 0.001
         ai = flops_sec/bytes
         ai_list.append(ai)
         print(index, ai)
