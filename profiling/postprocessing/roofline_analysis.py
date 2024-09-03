@@ -2,14 +2,19 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser()
+# T4 Version
 parser.add_argument('--results_dir', type=str, required=True,
                         help='path to directory containing the profiling files')
 parser.add_argument('--ai_threshold', type=float, default=9.37,
                         help='arithmetic intensity that seperates compute from memory bound kernels')
+# # A100 Version
+# parser.add_argument('--ai_threshold', type=float, default=7.73,
+#                         help='arithmetic intensity that seperates compute from memory bound kernels')
 args = parser.parse_args()
 
 df_raw = pd.read_csv(f'{args.results_dir}/raw_ncu.csv')
 
+# In case the data do not begin at the first line.
 startp = 0
 df_raw = df_raw.iloc[startp:]
 
@@ -28,6 +33,14 @@ ffma = 'smsp__sass_thread_inst_executed_op_ffma_pred_on.sum.per_cycle_elapsed [i
 cycles_sec = 'smsp__cycles_elapsed.avg.per_second [cycle/usecond]'
 bytes_sec = 'dram__bytes.sum.per_second [Gbyte/second]'
 
+# # A100 Version
+# fadd = 'smsp__sass_thread_inst_executed_op_fadd_pred_on.sum.per_cycle_elapsed'
+# fmul = 'smsp__sass_thread_inst_executed_op_fmul_pred_on.sum.per_cycle_elapsed'
+# ffma = 'smsp__sass_thread_inst_executed_op_ffma_pred_on.sum.per_cycle_elapsed'
+# # init nsecond, A100 GHz nsec
+# cycles_sec = 'smsp__cycles_elapsed.avg.per_second'
+# bytes_sec = 'dram__bytes.sum.per_second'
+
 ai_list = []
 roofline_prof = [] # 1: comp, 0: mem, -1: invalid
 
@@ -39,9 +52,10 @@ for index, row in df_raw.iterrows():
     add = str(row[fadd])
     mul = str(row[fmul])
     fma = row[ffma]
-    cycles = row[cycles_sec]
-    bytes = row[bytes_sec]
-    #print(add, mul, fma, cycles, bytes)
+    cycles = float(row[cycles_sec])
+    bytes = float(row[bytes_sec])
+    # print(add, mul, fma, cycles, bytes)
+    # print(type(add), type(mul), type(fma), type(cycles), type(bytes))
 
     if not isinstance(fma, float):
         fma = float(fma.replace("'", ''))
@@ -51,10 +65,10 @@ for index, row in df_raw.iterrows():
 
     if add or mul or fma:
         flops_cycle = add+mul+fma*2
-        flops_sec = flops_cycle * cycles * 0.001
+        flops_sec = flops_cycle * cycles * 0.001 # nsec->usec, *0.001
         ai = flops_sec/bytes
         ai_list.append(ai)
-        print(index, ai)
+        # print(index, ai)
         if ai > args.ai_threshold:
             roofline_prof.append(1)
             comp_bound += 1
@@ -69,8 +83,7 @@ for index, row in df_raw.iterrows():
             roofline_prof.append(0)
         else:
             roofline_prof.append(-1)
-        rest += 1
-
+        rest += 1 
 
 print(df_basic)
 df_basic['AI(flops/bytes)'] = ai_list

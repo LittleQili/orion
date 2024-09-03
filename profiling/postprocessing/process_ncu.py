@@ -29,7 +29,7 @@ for index, row in df.iterrows():
         kernels.append([kernel])
         unique_kernel_names.add(kernel)
     elif metric_name in metrics_to_get:
-        kernels[-1].append(row['Metric Value'])
+        kernels[-1].append(row['Metric Value'].replace(',',''))
 
 for x in unique_kernel_names:
     print(x)

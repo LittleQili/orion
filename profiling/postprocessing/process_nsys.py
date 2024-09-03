@@ -6,12 +6,16 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser()
+# T4 Version
 parser.add_argument('--results_dir', type=str, required=True,
                         help='path to directory containing the profiling files')
 parser.add_argument('--max_sms', type=int, default=40,
                         help='Number of SMs in the GPU')
 parser.add_argument('--metric', type=str, default="SM",
                         help='Which metric to plot: Could be either of "SM", "Comp", "Mem"')
+# # A100 Version
+# parser.add_argument('--max_sms', type=int, default=108,
+#                         help='Number of SMs in the GPU')
 args = parser.parse_args()
 
 def get_times(start_times, dur, sms, threshold):
@@ -59,7 +63,7 @@ start_time_all = df_nsys['Start (ns)']
 #     # i = float(i) / 1000000000
 #     print(k,v)
 # print(start_time_all / 1000000000)
-start_time_all = start_time_all / 1000000000
+start_time_all = start_time_all * 1e-9
 dur_all = df_nsys['Duration (ns)']
 grdx = df_nsys['GrdX']
 grdy = df_nsys['GrdY']
@@ -120,8 +124,8 @@ mem = mem_new
 comp = comp_new
 
 df_new = df_ncu
-df_new['Start (ns)'] = start_time
-df_new['Duration(ns)'] = dur
+df_new['Start (s)'] = start_time
+df_new['Duration (ns)'] = dur
 df_new.to_csv(f'{pwd}/output_ncu_nsys.csv')
 
 if plot_mem:

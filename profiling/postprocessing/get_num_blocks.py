@@ -14,6 +14,13 @@ parser.add_argument('--max_shmem_sm', type=int, default=65536,
                         help='maximum amount of shared memory (in bytes) per SM')
 parser.add_argument('--max_regs_sm', type=int, default=65536,
                         help='maximum number of registers per SM')
+# # A100 version
+# parser.add_argument('--max_threads_sm', type=int, default=2048,
+#                         help='maximum number of threads that can be active in an SM')
+# parser.add_argument('--max_blocks_sm', type=int, default=32,
+#                         help='maximum number of blocks that can be active in an SM')
+# parser.add_argument('--max_shmem_sm', type=int, default=167936,
+#                         help='maximum amount of shared memory (in bytes) per SM')
 args = parser.parse_args()
 
 df = pd.read_csv(f'{args.results_dir}/output_ncu_processed.csv', index_col=0)

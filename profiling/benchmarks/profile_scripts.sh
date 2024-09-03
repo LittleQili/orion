@@ -7,7 +7,8 @@ nsys profile -w true -t cuda,nvtx,osrt,cudnn,cublas -s none -o output_nsys --cud
 
 nsys stats --report gputrace --format csv,column --output .,- output_nsys.nsys-rep
 
-# ncu -o output_ncu --set detailed --nvtx --nvtx-include "start/" python3 vision_models.py
+ncu -o output_ncu --set detailed --nvtx --nvtx-include "start/" python3 vision_models.py
 
-# ncu --csv --set detailed --nvtx --nvtx-include "start/" python3 vision_models.py  > output_ncu.csv
+ncu -i output_ncu.ncu-rep --csv --page raw > raw_ncu.csv
 
+ncu --csv --set detailed --nvtx --nvtx-include "start/" --log-file output_ncu.csv python3 vision_models.py
